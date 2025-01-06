@@ -15,8 +15,6 @@ get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
-file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
-file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 
 if (BUILD_SHARED_LIBS)
   add_library(lvgl SHARED ${SOURCES})
@@ -36,15 +34,6 @@ target_compile_definitions(
 
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
-
-# Include /examples folder
-target_include_directories(lvgl_examples SYSTEM
-                           PUBLIC ${LVGL_ROOT_DIR}/examples)
-target_include_directories(lvgl_demos SYSTEM
-                           PUBLIC ${LVGL_ROOT_DIR}/demos)
-
-target_link_libraries(lvgl_examples PUBLIC lvgl)
-target_link_libraries(lvgl_demos PUBLIC lvgl)
 
 # Lbrary and headers can be installed to system using make install
 file(GLOB LVGL_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/lv_conf.h"

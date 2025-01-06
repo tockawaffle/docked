@@ -1,0 +1,10 @@
+{
+    "idf.port": "/dev/ttyACM0",
+    "idf.flashType": "UART",
+    "files.associations": {
+        "waveshare_rgb_lcd_port.h": "c",
+        "freertos.h": "c",
+        "lvgl.h": "c",
+        "ui.h": "c"
+    }
+}

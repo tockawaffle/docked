@@ -2,23 +2,23 @@ dependencies:
   espressif/esp_lcd_touch:
     dependencies: []
     source:
-      path: G:\08_lvgl_Porting\components\espressif__esp_lcd_touch
+      path: /home/tocka/ESP32-UI/components/espressif__esp_lcd_touch
       type: local
     version: 1.1.2
   espressif/esp_lcd_touch_gt911:
     dependencies: []
     source:
-      path: G:\08_lvgl_Porting\components\espressif__esp_lcd_touch_gt911
+      path: /home/tocka/ESP32-UI/components/espressif__esp_lcd_touch_gt911
       type: local
     version: 1.1.1~1
   idf:
     source:
       type: idf
-    version: 5.3.2
+    version: 5.4.0
   lvgl/lvgl:
     dependencies: []
     source:
-      path: G:\08_lvgl_Porting\components\lvgl__lvgl
+      path: /home/tocka/ESP32-UI/components/lvgl__lvgl
       type: local
     version: 8.4.0
 direct_dependencies:

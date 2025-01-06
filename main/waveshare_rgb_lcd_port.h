@@ -10,7 +10,6 @@
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_touch_gt911.h"
-#include "lv_demos.h"
 #include "lvgl_port.h"
 
 #define I2C_MASTER_SCL_IO           9       /*!< GPIO number used for I2C master clock */
