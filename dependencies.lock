@@ -2,23 +2,23 @@ dependencies:
   espressif/esp_lcd_touch:
     dependencies: []
     source:
-      path: /home/nixyan/ESP32-UI/components/espressif__esp_lcd_touch
+      path: /home/tocka/ESP32-UI/components/espressif__esp_lcd_touch
       type: local
     version: 1.1.2
   espressif/esp_lcd_touch_gt911:
     dependencies: []
     source:
-      path: /home/nixyan/ESP32-UI/components/espressif__esp_lcd_touch_gt911
+      path: /home/tocka/ESP32-UI/components/espressif__esp_lcd_touch_gt911
       type: local
     version: 1.1.1~1
   idf:
     source:
       type: idf
     version: 5.4.0
-  lvgl/lvgl:
+  lvgl:
     dependencies: []
     source:
-      path: /home/nixyan/ESP32-UI/components/lvgl__lvgl
+      path: /home/tocka/ESP32-UI/components/lvgl
       type: local
     version: 8.4.0
 direct_dependencies:
@@ -26,6 +26,6 @@ direct_dependencies:
 - espressif/esp_lcd_touch_gt911
 - idf
 - lvgl/lvgl
-manifest_hash: 0fa1fba2427deeb457135d4acb2922c571ca0bb2adafb9ee83d03e88f5914713
+manifest_hash: 764aba1a2680288293979a6d29cd63c591f1ccd2cdb2f56c38c8c86a49c302bf
 target: esp32s3
 version: 2.0.0

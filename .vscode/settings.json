@@ -5,6 +5,10 @@
         "waveshare_rgb_lcd_port.h": "c",
         "freertos.h": "c",
         "lvgl.h": "c",
-        "ui.h": "c"
-    }
+        "ui.h": "c",
+        "colors.h": "c",
+        "lv_anim.h": "c"
+    },
+    "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
+    "idf.toolsPath": "/home/tocka/.espressif"
 }

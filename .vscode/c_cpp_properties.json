@@ -7,7 +7,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/build/config/*",
                 "${config:idf.espIdfPath}/components/**",
-                "${workspaceFolder}/components/lvgl__lvgl/**",
+                "${workspaceFolder}/components/lvgl/**",
                 "${workspaceFolder}/components/espressif__esp_lcd_touch/**",
                 "${workspaceFolder}/components/espressif__esp_lcd_touch_gt911/**"
             ],
