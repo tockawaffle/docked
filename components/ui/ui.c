@@ -16,10 +16,7 @@ void create_ui(void)
     lv_obj_set_style_opa(main_screen, 255, 0);
     lv_obj_clear_flag(main_screen, LV_OBJ_FLAG_SCROLLABLE);
 
-    sidebar_t *sidebar = create_sidebar(main_screen);
-    if (!sidebar) {
-        return;
-    }
+    
 
     lv_scr_load(main_screen);
 }

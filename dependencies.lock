@@ -15,17 +15,18 @@ dependencies:
     source:
       type: idf
     version: 5.4.0
-  lvgl:
+  lvgl/lvgl:
+    component_hash: d7c1ac037ae6e85d94897f807d6e7ba0946a83e720074fc95a4f6241da9f9f53
     dependencies: []
     source:
-      path: /home/tocka/ESP32-UI/components/lvgl
-      type: local
+      registry_url: https://components.espressif.com/
+      type: service
     version: 8.4.0
 direct_dependencies:
 - espressif/esp_lcd_touch
 - espressif/esp_lcd_touch_gt911
 - idf
 - lvgl/lvgl
-manifest_hash: 764aba1a2680288293979a6d29cd63c591f1ccd2cdb2f56c38c8c86a49c302bf
+manifest_hash: 8d45f8b8043eed471809fd59f6232e7f16879483b2288632e00c3c439d3c3c6f
 target: esp32s3
 version: 2.0.0
