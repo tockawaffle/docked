@@ -4,6 +4,8 @@ UI/UX for the ESP32-LCD-7 base
 
 Please, build before doing anything. It requires some things from the build.
 
+I somehow made this work with LVGL v9.2.2, at least I'd like to think it works flawlessly (probably doesn't, so be aware of that.)
+
 <details>
 <summary>
 Build Configuration
