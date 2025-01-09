@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: CC0-1.0
  */
 
-#include "waveshare_rgb_lcd_port.h"
+#include "lcd_port.h"
 
 // VSYNC event callback function
 IRAM_ATTR static bool rgb_lcd_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *edata, void *user_ctx)
@@ -71,7 +71,7 @@ void waveshare_esp32_s3_touch_reset()
 #endif
 
 // Initialize RGB LCD
-esp_err_t waveshare_esp32_s3_rgb_lcd_init()
+esp_err_t lcd_init()
 {
     ESP_LOGI(TAG, "Install RGB LCD panel driver"); // Log the start of the RGB LCD panel driver installation
     esp_lcd_panel_handle_t panel_handle = NULL;    // Declare a handle for the LCD panel

@@ -67,7 +67,7 @@ static const char *TAG = "DECK";
 bool example_lvgl_lock(int timeout_ms);
 void example_lvgl_unlock(void);
 
-esp_err_t waveshare_esp32_s3_rgb_lcd_init();
+esp_err_t lcd_init();
 
 esp_err_t wavesahre_rgb_lcd_bl_on();
 esp_err_t wavesahre_rgb_lcd_bl_off();

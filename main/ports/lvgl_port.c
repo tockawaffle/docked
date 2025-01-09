@@ -609,3 +609,4 @@ bool lvgl_port_notify_rgb_vsync(void)
 #endif
     return (need_yield == pdTRUE); // Return whether a yield is needed
 }
+

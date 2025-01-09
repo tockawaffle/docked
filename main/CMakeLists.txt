@@ -1,9 +1,11 @@
 idf_component_register(
     SRCS 
-        "waveshare_rgb_lcd_port.c" 
         "main.c"
-        "lvgl_port.c"
-    INCLUDE_DIRS "."
+        "ports/lcd_port.c"
+        "ports/lvgl_port.c"
+    INCLUDE_DIRS 
+        "."
+        "ports"
     REQUIRES
         lvgl
         esp_lcd_touch 

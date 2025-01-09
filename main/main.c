@@ -1,9 +1,9 @@
-#include "waveshare_rgb_lcd_port.h"
+#include "./ports/lcd_port.h"
 #include "ui.h"
 
 void app_main()
 {
-    waveshare_esp32_s3_rgb_lcd_init(); // Initialize the Waveshare ESP32-S3 RGB LCD 
+    lcd_init(); // Initialize the Waveshare ESP32-S3 RGB LCD 
     // wavesahre_rgb_lcd_bl_on();  //Turn on the screen backlight 
     // wavesahre_rgb_lcd_bl_off(); //Turn off the screen backlight 
 

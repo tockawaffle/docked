@@ -7,7 +7,21 @@
         "lvgl.h": "c",
         "ui.h": "c",
         "colors.h": "c",
-        "lv_anim.h": "c"
+        "lv_anim.h": "c",
+        "lvgl_port.h": "c",
+        "stdint.h": "c",
+        "esp_lcd_touch.h": "c",
+        "esp_lcd_types.h": "c",
+        "controls.h": "c",
+        "lcd_types.h": "c",
+        "esp_log.h": "c",
+        "lcd_port.h": "c",
+        "gpio.h": "c",
+        "i2c.h": "c",
+        "task.h": "c",
+        "esp_lcd_touch_gt911.h": "c",
+        "cstdlib": "c",
+        "esp_lcd_panel_rgb.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"

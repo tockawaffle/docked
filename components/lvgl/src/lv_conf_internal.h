@@ -223,7 +223,7 @@
     #ifdef CONFIG_LV_DEF_REFR_PERIOD
         #define LV_DEF_REFR_PERIOD CONFIG_LV_DEF_REFR_PERIOD
     #else
-        #define LV_DEF_REFR_PERIOD  33      /*[ms]*/
+        #define LV_DEF_REFR_PERIOD  30      /*[ms]*/
     #endif
 #endif
 
@@ -2816,7 +2816,7 @@
     #ifdef CONFIG_LV_USE_SYSMON
         #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
     #else
-        #define LV_USE_SYSMON   0
+        #define LV_USE_SYSMON   1
     #endif
 #endif
 #if LV_USE_SYSMON
@@ -2835,7 +2835,7 @@
         #ifdef CONFIG_LV_USE_PERF_MONITOR
             #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
         #else
-            #define LV_USE_PERF_MONITOR 0
+            #define LV_USE_PERF_MONITOR 1
         #endif
     #endif
     #if LV_USE_PERF_MONITOR

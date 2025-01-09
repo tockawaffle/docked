@@ -11,7 +11,7 @@
 #include "esp_err.h"
 #include "esp_lcd_types.h"
 #include "esp_lcd_touch.h"
-#include "lvgl.h"
+#include <lvgl.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -78,7 +78,7 @@ extern "C"
  *      - 270: 270 degree
  *
  */
-#define EXAMPLE_LVGL_PORT_ROTATION_DEGREE (CONFIG_EXAMPLE_LVGL_PORT_ROTATION_DEGREE)
+#define EXAMPLE_LVGL_PORT_ROTATION_DEGREE (0)
 
 /**
  * Below configurations are automatically set according to the above configurations, users do not need to modify them.
@@ -128,6 +128,8 @@ extern "C"
      *      - Others: Fail
      */
     esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle_t tp_handle);
+
+    esp_err_t rotate_screen(uint16_t rotation);  // Add this to lvgl_port.h
 
     /**
      * @brief Take LVGL mutex

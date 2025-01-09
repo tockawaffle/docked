@@ -1,4 +1,4 @@
-file(GLOB_RECURSE UI_SOURCES 
+file(GLOB_RECURSE UI_SOURCES
     "*.c"
     "components/*/*.c"
 )
@@ -6,6 +6,8 @@ file(GLOB_RECURSE UI_SOURCES
 idf_component_register(
     SRCS ${UI_SOURCES}
     INCLUDE_DIRS "." "components"
-    REQUIRES lvgl
+    REQUIRES
+    lvgl
+    main
 )
 
