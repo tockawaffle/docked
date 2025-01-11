@@ -21,7 +21,8 @@
         "task.h": "c",
         "esp_lcd_touch_gt911.h": "c",
         "cstdlib": "c",
-        "esp_lcd_panel_rgb.h": "c"
+        "esp_lcd_panel_rgb.h": "c",
+        "sidebar.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"
