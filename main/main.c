@@ -1,14 +1,16 @@
 #include "./ports/lcd_port.h"
 #include "ui.h"
+#include "sd_card/sd_card.h"
 
 void app_main()
 {
-    lcd_init(); // Initialize the Waveshare ESP32-S3 RGB LCD 
-    // wavesahre_rgb_lcd_bl_on();  //Turn on the screen backlight 
-    // wavesahre_rgb_lcd_bl_off(); //Turn off the screen backlight 
+    ESP_ERROR_CHECK(lcd_init());
+    vTaskDelay(pdMS_TO_TICKS(500));
 
     // Lock the mutex due to the LVGL APIs are not thread-safe
-    if (lvgl_port_lock(-1)) {
+    if (lvgl_port_lock(-1))
+    {
+        ESP_ERROR_CHECK(sd_card_init());
         // Creates the UI
         create_ui();
         // Release the mutex

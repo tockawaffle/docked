@@ -129,7 +129,7 @@ extern "C"
      */
     esp_err_t lvgl_port_init(esp_lcd_panel_handle_t lcd_handle, esp_lcd_touch_handle_t tp_handle);
 
-    esp_err_t rotate_screen(uint16_t rotation);  // Add this to lvgl_port.h
+    esp_err_t rotate_screen(uint16_t rotation); // Add this to lvgl_port.h
 
     /**
      * @brief Take LVGL mutex

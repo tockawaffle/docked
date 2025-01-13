@@ -308,7 +308,8 @@ static void flush_callback(struct _lv_display_t *disp, const lv_area_t *area, ui
     const int offsety2 = area->y2;
 
     // Wait for previous frame if this is the last area
-    if (lv_display_flush_is_last(disp)) {
+    if (lv_display_flush_is_last(disp))
+    {
         ulTaskNotifyValueClear(NULL, ULONG_MAX);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
@@ -404,18 +405,19 @@ static lv_display_t *display_init(esp_lcd_panel_handle_t panel_handle)
     assert(panel_handle);
 
     ESP_LOGD(TAG, "Initialize display");
-    
+
     // Calculate buffer size and stride
     const uint32_t h_res = LVGL_PORT_H_RES;
     const uint32_t v_res = LVGL_PORT_V_RES;
     const size_t buffer_size = h_res * v_res;
-    
+
     // Allocate buffers with proper alignment
     void *buf1 = heap_caps_aligned_calloc(64, 1, buffer_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     assert(buf1);
-    
+
     void *buf2 = NULL;
-    if (LVGL_PORT_LCD_RGB_BUFFER_NUMS > 1) {
+    if (LVGL_PORT_LCD_RGB_BUFFER_NUMS > 1)
+    {
         buf2 = heap_caps_aligned_calloc(64, 1, buffer_size * sizeof(lv_color_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
         assert(buf2);
     }
@@ -423,30 +425,31 @@ static lv_display_t *display_init(esp_lcd_panel_handle_t panel_handle)
     // Create draw buffers
     static lv_draw_buf_t draw_buf1;
     static lv_draw_buf_t draw_buf2;
-    
+
     const size_t stride = ((h_res * 16 + 31) / 32) * 4;
-    
+
     lv_draw_buf_init(&draw_buf1, h_res, v_res, LV_COLOR_FORMAT_RGB565, stride, buf1, buffer_size * sizeof(lv_color_t));
-    if (buf2) {
+    if (buf2)
+    {
         lv_draw_buf_init(&draw_buf2, h_res, v_res, LV_COLOR_FORMAT_RGB565, stride, buf2, buffer_size * sizeof(lv_color_t));
     }
 
     lv_display_t *disp = lv_display_create(h_res, v_res);
     assert(disp);
-    
+
     lv_display_set_draw_buffers(disp, &draw_buf1, buf2 ? &draw_buf2 : NULL);
     lv_display_set_flush_cb(disp, flush_callback);
     lv_display_set_user_data(disp, panel_handle);
 
-    #if EXAMPLE_LVGL_PORT_ROTATION_90 || EXAMPLE_LVGL_PORT_ROTATION_270
-        lv_display_set_resolution(disp, LVGL_PORT_V_RES, LVGL_PORT_H_RES);
-    #endif
+#if EXAMPLE_LVGL_PORT_ROTATION_90 || EXAMPLE_LVGL_PORT_ROTATION_270
+    lv_display_set_resolution(disp, LVGL_PORT_V_RES, LVGL_PORT_H_RES);
+#endif
 
-    #if LVGL_PORT_FULL_REFRESH
-        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
-    #elif LVGL_PORT_DIRECT_MODE
-        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
-    #endif
+#if LVGL_PORT_FULL_REFRESH
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
+#elif LVGL_PORT_DIRECT_MODE
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
+#endif
 
     return disp;
 }
@@ -455,9 +458,10 @@ static void touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
 {
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
-    
+
     esp_lcd_touch_handle_t tp = (esp_lcd_touch_handle_t)lv_indev_get_driver_data(indev);
-    if (!tp) {
+    if (!tp)
+    {
         data->state = LV_INDEV_STATE_RELEASED;
         return;
     }
@@ -469,25 +473,29 @@ static void touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
     esp_lcd_touch_read_data(tp);
     bool touched = esp_lcd_touch_get_coordinates(tp, &touchpad_x, &touchpad_y, NULL, &touchpad_cnt, 1);
 
-    if (touched && touchpad_cnt > 0) {
+    if (touched && touchpad_cnt > 0)
+    {
         last_x = touchpad_x;
         last_y = touchpad_y;
         data->state = LV_INDEV_STATE_PRESSED;
         data->point.x = last_x;
         data->point.y = last_y;
-    } else {
+    }
+    else
+    {
         data->state = LV_INDEV_STATE_RELEASED;
     }
 }
 
 static lv_indev_t *indev_init(esp_lcd_touch_handle_t tp)
 {
-    if (!tp) {
+    if (!tp)
+    {
         return NULL;
     }
 
     lv_indev_t *indev = lv_indev_create();
-    
+
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, touchpad_read);
     lv_indev_set_driver_data(indev, tp);
@@ -609,4 +617,3 @@ bool lvgl_port_notify_rgb_vsync(void)
 #endif
     return (need_yield == pdTRUE); // Return whether a yield is needed
 }
-

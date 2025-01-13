@@ -22,7 +22,13 @@
         "esp_lcd_touch_gt911.h": "c",
         "cstdlib": "c",
         "esp_lcd_panel_rgb.h": "c",
-        "sidebar.h": "c"
+        "sidebar.h": "c",
+        "esp_heap_caps.h": "c",
+        "sd_card.h": "c",
+        "i2c_master.h": "c",
+        "esp_lcd_panel_ops.h": "c",
+        "spi_common.h": "c",
+        "sdkconfig.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"
