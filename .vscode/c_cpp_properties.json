@@ -4,18 +4,16 @@
             "name": "ESP-IDF",
             "compilerPath": "${config:idf.toolsPath}/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/build/config/*",
-                "${config:idf.espIdfPath}/components/**",
-                "${workspaceFolder}/components/lvgl/**",
-                "${workspaceFolder}/components/espressif__esp_lcd_touch/**",
-                "${workspaceFolder}/components/espressif__esp_lcd_touch_gt911/**"
+                "${config:idf.espIdfPath}/components",
+                "${config:idf.espIdfPathWin}/components/",
+                "${workspaceFolder}/"
             ],
             "browse": {
                 "path": [
                     "${workspaceFolder}",
                     "${config:idf.espIdfPath}/components",
-                    "${workspaceFolder}/components"
+                    "${workspaceFolder}/components",
+                    "${workspaceFolder}/build/config"
                 ],
                 "limitSymbolsToIncludedHeaders": false
             },

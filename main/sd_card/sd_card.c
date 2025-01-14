@@ -1,4 +1,5 @@
 #include "sd_card.h"
+#include "lv_fs.h"
 
 static sdmmc_card_t *card;
 static const char mount_point[] = MOUNT_POINT;
@@ -125,6 +126,16 @@ esp_err_t sd_card_init(void)
     ESP_LOGI(SD_TAG, "Sector size: %d", card->csd.sector_size);
 
     ESP_LOGI(SD_TAG, "SD Card mounted successfully");
+
+    ESP_LOGI(SD_TAG, "Initializing LittlevGL file system interface");
+    ret = init_lvgl_fs();
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(SD_TAG, "Failed to initialize LittlevGL file system interface: %s", esp_err_to_name(ret));
+        return ret;
+    }
+    ESP_LOGI(SD_TAG, "LittlevGL file system interface initialized");
+
     return ESP_OK;
 }
 

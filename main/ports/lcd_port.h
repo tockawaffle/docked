@@ -62,7 +62,7 @@
 #define EXAMPLE_PIN_NUM_TOUCH_RST (-1) // -1 if not used
 #define EXAMPLE_PIN_NUM_TOUCH_INT (-1) // -1 if not used
 
-static const char *LCD_TAG = "LCD Driver";
+#define LCD_TAG "LCD Driver"
 
 esp_err_t lcd_init();
 

@@ -23,12 +23,22 @@
         "cstdlib": "c",
         "esp_lcd_panel_rgb.h": "c",
         "sidebar.h": "c",
+        "splash.h": "c",
         "esp_heap_caps.h": "c",
         "sd_card.h": "c",
         "i2c_master.h": "c",
         "esp_lcd_panel_ops.h": "c",
         "spi_common.h": "c",
-        "sdkconfig.h": "c"
+        "sdkconfig.h": "c",
+        "event_groups.h": "c",
+        "wifi.h": "c",
+        "esp_mac.h": "c",
+        "err.h": "c",
+        "esp_event.h": "c",
+        "inttypes.h": "c",
+        "string.h": "c",
+        "esp_err.h": "c",
+        "lv_fs.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"

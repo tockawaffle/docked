@@ -1,7 +1,7 @@
 #ifndef _SD_CARD_
 #define _SD_CARD_
 
-static const char *SD_TAG = "SDCard";
+#define SD_TAG "SDCard"
 
 #include <string.h>
 #include <sys/unistd.h>
