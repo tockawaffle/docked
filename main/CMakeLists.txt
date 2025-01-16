@@ -3,13 +3,14 @@ idf_component_register(
     "main.c"
     "ports/lcd_port.c"
     "ports/lvgl_port.c"
-    "sd_card/sd_card.c"
-    "sd_card/lv_fs.c"
+    "storage/sd_card.c"
+    "storage/lv_fs.c"
+    "storage/wifi_config.c"
     "wifi/wifi.c"
     INCLUDE_DIRS
     "."
     "ports"
-    "sd_card"
+    "storage"
     "wifi"
     REQUIRES
     lvgl
@@ -26,7 +27,7 @@ idf_component_register(
 )
 
 # Add optimization flags
-target_compile_options(${COMPONENT_LIB} PRIVATE 
+target_compile_options(${COMPONENT_LIB} PRIVATE
     -Os
     -ffunction-sections
     -fdata-sections

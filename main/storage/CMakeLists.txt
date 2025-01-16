@@ -1,0 +1,11 @@
+idf_component_register(
+    SRCS
+    "sd_card.c"
+    "lv_fs.c"
+    "wifi_config.c"
+    INCLUDE_DIRS
+    "."
+    REQUIRES
+    "lvgl"
+    "nvs_flash"
+)

@@ -1,13 +1,13 @@
 #include "wifi.h"
 
-#include "freertos/event_groups.h"
-#include <inttypes.h>
-
 static EventGroupHandle_t s_wifi_event_group = NULL;
 
 static esp_netif_t *wifi_netif = NULL;
 static esp_event_handler_instance_t ip_event_handler;
 static esp_event_handler_instance_t wifi_event_handler;
+
+static const int WIFI_RETRY_ATTEMPT = 3;
+static int wifi_retry_count = 0;
 
 static void ip_event_cb(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -203,4 +203,87 @@ esp_err_t wifi_destroy(void)
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler));
 
     return ESP_OK;
+}
+
+esp_err_t wifi_restart(void)
+{
+    esp_err_t ret = esp_wifi_stop();
+    if (ret == ESP_ERR_WIFI_NOT_INIT)
+    {
+        ESP_LOGE(WIFI_TAG, "Wi-Fi stack not initialized");
+        return ret;
+    }
+
+    ESP_ERROR_CHECK(esp_wifi_deinit());
+    ESP_ERROR_CHECK(esp_wifi_clear_default_wifi_driver_and_handlers(wifi_netif));
+    esp_netif_destroy(wifi_netif);
+
+    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, ESP_EVENT_ANY_ID, ip_event_handler));
+    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler));
+
+    return wifi_init();
+}
+
+wifi_scan_result_t wifi_scan(void)
+{
+    wifi_scan_result_t result = {
+        .status = ESP_OK,
+        .ap_count = 0,
+        .ssids = {{0}}, // Initialize arrays to zero
+        .rssis = {0}};
+
+    uint16_t number = DEFAULT_SCAN_LIST_SIZE;
+    wifi_ap_record_t ap_info[DEFAULT_SCAN_LIST_SIZE];
+
+    ESP_LOGI(WIFI_TAG, "Wi-Fi scan started");
+
+    // Set mode and start WiFi
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_start());
+
+    // Start scan
+    esp_err_t ret = esp_wifi_scan_start(NULL, true);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(WIFI_TAG, "Failed to start Wi-Fi scan: %s", esp_err_to_name(ret));
+        result.status = ret;
+        return result;
+    }
+
+    // Get scan results
+    ret = esp_wifi_scan_get_ap_num(&result.ap_count);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(WIFI_TAG, "Failed to get number of access points: %s", esp_err_to_name(ret));
+        result.status = ret;
+        return result;
+    }
+
+    // Ensure we don't exceed array bounds
+    if (result.ap_count > DEFAULT_SCAN_LIST_SIZE)
+    {
+        result.ap_count = DEFAULT_SCAN_LIST_SIZE;
+    }
+
+    ret = esp_wifi_scan_get_ap_records(&number, ap_info);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(WIFI_TAG, "Failed to get AP records: %s", esp_err_to_name(ret));
+        result.status = ret;
+        return result;
+    }
+
+    // Copy results to our structure
+    for (int i = 0; i < result.ap_count; i++)
+    {
+        strncpy(result.ssids[i], (char *)ap_info[i].ssid, 32);
+        result.ssids[i][32] = '\0'; // Ensure null termination
+        result.rssis[i] = ap_info[i].rssi;
+
+        ESP_LOGI(WIFI_TAG, "SSID: %s", result.ssids[i]);
+        ESP_LOGI(WIFI_TAG, "RSSI: %d", result.rssis[i]);
+    }
+
+    ESP_LOGI(WIFI_TAG, "Number of access points found: %d", result.ap_count);
+    return result;
 }

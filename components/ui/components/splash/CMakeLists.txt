@@ -1,12 +1,13 @@
-file(GLOB_RECURSE UI_SOURCES
-    "*.c"
-)
-
 idf_component_register(
-    SRCS ${UI_SOURCES}
-    INCLUDE_DIRS "." "components"
+    SRCS 
+        "src/splash_screen.c"
+        "src/splash_wifi.c"
+        "src/splash_keyboard.c"
+    INCLUDE_DIRS 
+        "include"
+        "private"
+    PRIV_INCLUDE_DIRS
+        "private"
     REQUIRES
         lvgl
-        main
 )
-

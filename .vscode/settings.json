@@ -38,7 +38,20 @@
         "inttypes.h": "c",
         "string.h": "c",
         "esp_err.h": "c",
-        "lv_fs.h": "c"
+        "lv_fs.h": "c",
+        "nvs_flash.h": "c",
+        "esp_wifi.h": "c",
+        "wifi_config.h": "c",
+        "splash_components.h": "c",
+        "system_error": "c",
+        "regex": "c",
+        "create_password.h": "c",
+        "create_wifi_list.h": "c",
+        "splash_task.h": "c",
+        "main_splash_comps.h": "c",
+        "wifi_ui.h": "c",
+        "splash_screen.h": "c",
+        "splash_internal.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"

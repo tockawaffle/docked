@@ -1,5 +1,4 @@
 #include "sidebar.h"
-#include "logos/logo.h"
 
 lv_obj_t *separator(lv_obj_t *parent)
 {
@@ -18,13 +17,8 @@ lv_obj_t *logo_img(lv_obj_t *parent)
     lv_obj_t *image;
     image = lv_img_create(parent);
     
-    // Debug info
-    LV_LOG_USER("Image size: %dx%d", (int)logo.header.w, (int)logo.header.h);
-    LV_LOG_USER("Color format: %d", (int)logo.header.cf);
-    LV_LOG_USER("Data size: %lu", (unsigned long)logo.data_size);
-    
     // Set up image
-    lv_img_set_src(image, &logo);
+    lv_img_set_src(image, "S:/assets/logos/logo.png");
     
     // Enable scaling
     lv_img_set_zoom(image, 256);  // 256 = no zoom (internal 8-bit fp format)
