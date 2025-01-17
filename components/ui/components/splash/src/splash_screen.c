@@ -113,7 +113,7 @@ static void splash_task_cb(lv_timer_t *timer)
             {
                 lv_label_set_text(ctx.debug_label, "Debug: Wi-Fi credentials read successfully.");
                 lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0x00FF00), 0);
-                
+
                 ret = wifi_restart();
                 if (ret != ESP_OK)
                 {
@@ -138,7 +138,36 @@ static void splash_task_cb(lv_timer_t *timer)
             lv_timer_del(timer);
         }
         break;
+    case SPLASH_STATE_RECONNECT_WIFI:
+        lv_label_set_text(ctx.debug_label, "Debug: Reconnecting to Wi-Fi...");
+        wifi_credentials_t wifi_credentials;
+        ret = read_wifi_config(&wifi_credentials);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(SPLASH_TAG, "Failed to read Wi-Fi credentials: %s", esp_err_to_name(ret));
+            lv_label_set_text(ctx.debug_label, "Debug: Failed to read Wi-Fi credentials.");
+            lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
+            lv_timer_del(timer);
+        }
+        else
+        {
+            ret = wifi_connect(wifi_credentials.ssid, wifi_credentials.password);
+            if (ret == ESP_OK)
+            {
+                lv_label_set_text(ctx.debug_label, "Debug: Reconnected to Wi-Fi successfully.");
+                lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0x00FF00), 0);
+                ctx.state = SPLASH_INIT_UI;
+            }
+            else
+            {
+                ESP_LOGE(SPLASH_TAG, "Failed to reconnect to Wi-Fi: %s", esp_err_to_name(ret));
+                lv_label_set_text(ctx.debug_label, "Debug: Failed to reconnect to Wi-Fi.");
+                lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
+                lv_timer_del(timer);
+            }
+        }
 
+        break;
     case SPLASH_INIT_UI:
         lv_bar_set_value(ctx.loading_bar, 100, LV_ANIM_ON);
         ctx.state = SPLASH_INIT_DONE;

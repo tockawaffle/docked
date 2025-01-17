@@ -58,8 +58,6 @@ void splash_wifi_create_network_list(splash_ctx_t *ctx, wifi_scan_result_t *scan
         ESP_LOGI(SPLASH_TAG, "Creating network button for SSID: '%s' (len: %d)",
                  ssid_copy, strlen(ssid_copy));
 
-        lv_obj_set_user_data(btn, ssid_copy);
-
         // SSID label
         lv_obj_t *ssid_label = lv_label_create(layout);
         lv_label_set_text(ssid_label, scan_result->ssids[i]);
@@ -79,9 +77,11 @@ void splash_wifi_create_network_list(splash_ctx_t *ctx, wifi_scan_result_t *scan
                                     signal_strength > 70 ? lv_color_hex(0x00FF00) : signal_strength > 40 ? lv_color_hex(0xFFFF00)
                                                                                                          : lv_color_hex(0xFF0000),
                                     0);
-
+        lv_obj_set_user_data(btn, ssid_copy);
+        
         // Store SSID in button user data and add click event
-        lv_obj_add_event_cb(btn, splash_on_wifi_button_click, LV_EVENT_CLICKED, (void *)scan_result->ssids[i]);
+        ESP_LOGI(SPLASH_TAG, "Scan Results: %s", scan_result->ssids[i]);
+        lv_obj_add_event_cb(btn, splash_on_wifi_button_click, LV_EVENT_CLICKED, ssid_copy);
     }
 }
 
@@ -90,11 +90,14 @@ void splash_on_wifi_button_click(lv_event_t *e)
     splash_ctx_t *ctx = splash_screen_get_context();
     const char *ssid = lv_event_get_user_data(e);
 
+    ESP_LOGI(SPLASH_TAG, "Current Context: %p", ctx);
+    ESP_LOGI(SPLASH_TAG, "Selected WiFi SSID (A): %s", ssid);
+
     // Store the selected SSID
     strncpy(ctx->selected_ssid, ssid, sizeof(ctx->selected_ssid) - 1);
     ctx->selected_ssid[sizeof(ctx->selected_ssid) - 1] = '\0';
 
-    ESP_LOGI(SPLASH_TAG, "Selected WiFi SSID: %s", ctx->selected_ssid);
+    ESP_LOGI(SPLASH_TAG, "Selected WiFi SSID (B): %s", ctx->selected_ssid);
 
     // Update the SSID label in the popup
     lv_obj_t *ssid_label = lv_obj_get_child(ctx->password_popup, 2);
@@ -131,12 +134,69 @@ void splash_on_password_submit(lv_event_t *e)
     {
         lv_obj_add_flag(ctx->password_popup, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(ctx->keyboard, LV_OBJ_FLAG_HIDDEN);
-        lv_label_set_text(ctx->debug_label, "Debug: WiFi credentials saved successfully.");
-        ctx->state = SPLASH_INIT_UI;
+        lv_label_set_text(ctx->debug_label, "Debug: WiFi credentials saved successfully. Reconnecting...");
+        lv_obj_set_style_text_color(ctx->debug_label, lv_color_hex(0x00FF00), 0);
+
+        // Wait for a bit and then try to reconnect
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        splash_screen_set_state(SPLASH_STATE_RECONNECT_WIFI);
+
+        // Cleanup
+        splash_cleanup_wifi_list(ctx);
+        splash_cleanup_wifi_popup(ctx);
     }
     else
     {
         lv_label_set_text(ctx->debug_label, "Debug: Failed to save WiFi credentials.");
         lv_obj_set_style_text_color(ctx->debug_label, lv_color_hex(0xFF0000), 0);
+    }
+}
+
+void splash_cleanup_wifi_list(splash_ctx_t *ctx)
+{
+    if (ctx->networks_list)
+    {
+        // Free button data for each button
+        uint32_t child_cnt = lv_obj_get_child_cnt(ctx->networks_list);
+        for (uint32_t i = 0; i < child_cnt; i++)
+        {
+            lv_obj_t *child = lv_obj_get_child(ctx->networks_list, i);
+            if (child)
+            {
+                // Get and free the allocated SSID copy
+                void *ssid_copy = lv_obj_get_user_data(child);
+                if (ssid_copy)
+                {
+                    ESP_LOGI(SPLASH_TAG, "Freeing SSID memory: %s", (char *)ssid_copy);
+                    free(ssid_copy);
+                }
+            }
+        }
+        // Delete the entire list widget (this also deletes all child widgets)
+        lv_obj_del(ctx->networks_list);
+        ctx->networks_list = NULL;
+    }
+}
+
+// Call this when closing the WiFi popup
+void splash_cleanup_wifi_popup(splash_ctx_t *ctx)
+{
+    // Clear the selected SSID
+    memset(ctx->selected_ssid, 0, sizeof(ctx->selected_ssid));
+
+    // Hide the popup and keyboard
+    if (ctx->password_popup)
+    {
+        lv_obj_add_flag(ctx->password_popup, LV_OBJ_FLAG_HIDDEN);
+    }
+    if (ctx->keyboard)
+    {
+        lv_obj_add_flag(ctx->keyboard, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    // Clear any password input
+    if (ctx->password_input)
+    {
+        lv_textarea_set_text(ctx->password_input, "");
     }
 }

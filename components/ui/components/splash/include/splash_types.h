@@ -5,6 +5,7 @@
 typedef enum {
     SPLASH_INIT_SD_CARD,
     SPLASH_INIT_WIFI,
+    SPLASH_STATE_RECONNECT_WIFI,
     SPLASH_INIT_UI,
     SPLASH_INIT_DONE
 } splash_init_state_t;

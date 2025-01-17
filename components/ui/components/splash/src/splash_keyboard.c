@@ -1,5 +1,8 @@
 #include "splash_internal.h"
 
+void splash_keyboard_init(splash_ctx_t *ctx);
+void splash_on_keyboard_input(lv_event_t *e);
+
 void splash_wifi_create_password_popup(splash_ctx_t *ctx)
 {
     if (ctx->password_popup == NULL)
