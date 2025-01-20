@@ -1,11 +1,29 @@
 #include "splash_internal.h"
 
 static splash_ctx_t ctx;
-static void splash_task_cb(lv_timer_t *timer);
+
+#define DEBUG_KEY 1
 
 splash_ctx_t *splash_screen_get_context(void)
 {
     return &ctx;
+}
+
+splash_init_state_t splash_screen_set_state(splash_init_state_t new_ctx)
+{
+    splash_init_state_t old_state = ctx.state;
+    ctx.state = new_ctx;
+    ESP_LOGI(SPLASH_TAG, "State changed from %d to %d", old_state, new_ctx);
+    return old_state;
+}
+
+void splash_delete_timer(lv_timer_t *timer, const char *caller_function)
+{
+    if (timer && !ctx.timer_deleted)
+    { // Check if not already deleted
+        ESP_LOGI(SPLASH_TAG, "Timer deleted by: %s", caller_function);
+        lv_timer_del(timer);
+    }
 }
 
 void splash_screen_init(lv_obj_t *main_screen)
@@ -52,14 +70,22 @@ void splash_screen_init(lv_obj_t *main_screen)
     ctx.password_popup = NULL;
     ctx.password_input = NULL;
     ctx.keyboard = NULL;
+    ctx.timer_deleted = false;
 
     // Create a timer to handle the initialization steps
     lv_timer_create(splash_task_cb, 500, NULL);
 }
 
-static void splash_task_cb(lv_timer_t *timer)
+void splash_task_cb(lv_timer_t *timer)
 {
+    if (ctx.timer_deleted)
+    {
+        return;
+    }
+
     esp_err_t ret;
+
+    ESP_LOGI(SPLASH_TAG, "Current state: %d", ctx.state);
 
     switch (ctx.state)
     {
@@ -76,7 +102,10 @@ static void splash_task_cb(lv_timer_t *timer)
             ESP_LOGE(SPLASH_TAG, "Failed to initialize SD Card: %s", esp_err_to_name(ret));
             lv_label_set_text(ctx.debug_label, "Debug: Failed to initialize SD Card. Please check if there's any inserted.");
             lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
-            lv_timer_del(timer);
+
+            ESP_LOGI(SPLASH_TAG, "Deleting timer at SPLASH_INIT_SD_CARD");
+            // f
+            return;
         }
         break;
 
@@ -89,7 +118,11 @@ static void splash_task_cb(lv_timer_t *timer)
             lv_label_set_text(ctx.debug_label, "Debug: Reading Wi-Fi configuration...");
             wifi_credentials_t wifi_credentials;
             ret = read_wifi_config(&wifi_credentials);
-            ESP_LOGI(SPLASH_TAG, "SSID: %s", wifi_credentials.ssid);
+
+#if DEBUG_KEY
+            ret = ESP_FAIL; // Force the error for testing
+#endif
+
             if (ret != ESP_OK)
             {
                 ESP_LOGE(SPLASH_TAG, "Failed to read Wi-Fi credentials: %s", esp_err_to_name(ret));
@@ -100,13 +133,18 @@ static void splash_task_cb(lv_timer_t *timer)
                     ESP_LOGE(SPLASH_TAG, "Failed to scan Wi-Fi networks: %s", esp_err_to_name(ret));
                     lv_label_set_text(ctx.debug_label, "Debug: Failed to scan Wi-Fi networks.");
                     lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
-                    lv_timer_del(timer);
+
+                    ESP_LOGI(SPLASH_TAG, "Deleting timer at SPLASH_INIT_WIFI");
+                    splash_delete_timer(timer, __FUNCTION__);
+                    return;
                 }
                 else
                 {
                     lv_label_set_text(ctx.debug_label, "Debug: Wi-Fi networks scanned successfully.");
+                    lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0x00FF00), 0);
                     splash_wifi_create_network_list(&ctx, &scan_result);
                     splash_wifi_create_password_popup(&ctx);
+                    ctx.state = SPLASH_WAIT_WIFI_INPUT;
                 }
             }
             else
@@ -120,11 +158,13 @@ static void splash_task_cb(lv_timer_t *timer)
                     ESP_LOGE(SPLASH_TAG, "Failed to restart Wi-Fi: %s", esp_err_to_name(ret));
                     lv_label_set_text(ctx.debug_label, "Debug: Failed to restart Wi-Fi.");
                     lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
-                    lv_timer_del(timer);
+
+                    ESP_LOGI(SPLASH_TAG, "Deleting timer at SPLASH_INIT_WIFI 2");
+                    splash_delete_timer(timer, __FUNCTION__);
+                    return;
                 }
                 else
                 {
-
                     ctx.state = SPLASH_INIT_UI;
                 }
                 ctx.state = SPLASH_INIT_UI;
@@ -135,46 +175,61 @@ static void splash_task_cb(lv_timer_t *timer)
             ESP_LOGE(SPLASH_TAG, "Failed to initialize Wi-Fi: %s", esp_err_to_name(ret));
             lv_label_set_text(ctx.debug_label, "Debug: Failed to initialize Wi-Fi.");
             lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
-            lv_timer_del(timer);
+
+            ESP_LOGI(SPLASH_TAG, "Deleting timer at SPLASH_INIT_WIFI 3");
+            splash_delete_timer(timer, __FUNCTION__);
+            return;
         }
         break;
     case SPLASH_STATE_RECONNECT_WIFI:
+        ESP_LOGI(SPLASH_TAG, "Reconnecting to Wi-Fi...");
         lv_label_set_text(ctx.debug_label, "Debug: Reconnecting to Wi-Fi...");
-        wifi_credentials_t wifi_credentials;
-        ret = read_wifi_config(&wifi_credentials);
-        if (ret != ESP_OK)
-        {
-            ESP_LOGE(SPLASH_TAG, "Failed to read Wi-Fi credentials: %s", esp_err_to_name(ret));
-            lv_label_set_text(ctx.debug_label, "Debug: Failed to read Wi-Fi credentials.");
-            lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
-            lv_timer_del(timer);
-        }
-        else
-        {
-            ret = wifi_connect(wifi_credentials.ssid, wifi_credentials.password);
-            if (ret == ESP_OK)
+        { // Added block to handle local variable declarations
+            wifi_credentials_t wifi_credentials;
+            ret = read_wifi_config(&wifi_credentials);
+            if (ret != ESP_OK)
             {
-                lv_label_set_text(ctx.debug_label, "Debug: Reconnected to Wi-Fi successfully.");
-                lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0x00FF00), 0);
-                ctx.state = SPLASH_INIT_UI;
+                ESP_LOGE(SPLASH_TAG, "Failed to read Wi-Fi credentials: %s", esp_err_to_name(ret));
+                lv_label_set_text(ctx.debug_label, "Debug: Failed to read Wi-Fi credentials. Please reconfigure.");
+                lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
+
+                // Maybe set the state to SPLASH_INIT_WIFI to retry?
+                ctx.state = SPLASH_INIT_WIFI; // This might cause bugs, be aware!!!
             }
             else
             {
-                ESP_LOGE(SPLASH_TAG, "Failed to reconnect to Wi-Fi: %s", esp_err_to_name(ret));
-                lv_label_set_text(ctx.debug_label, "Debug: Failed to reconnect to Wi-Fi.");
-                lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
-                lv_timer_del(timer);
+                ret = wifi_connect(wifi_credentials.ssid, wifi_credentials.password);
+                if (ret == ESP_OK)
+                {
+                    lv_label_set_text(ctx.debug_label, "Debug: Reconnected to Wi-Fi successfully.");
+                    lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0x00FF00), 0);
+                    ctx.state = SPLASH_INIT_UI;
+                }
+                else
+                {
+                    ESP_LOGE(SPLASH_TAG, "Failed to reconnect to Wi-Fi: %s", esp_err_to_name(ret));
+                    lv_label_set_text(ctx.debug_label, "Debug: Failed to reconnect to Wi-Fi.");
+                    lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
+
+                    // We should stop the timer here, as we are in a failed state
+                    ESP_LOGI(SPLASH_TAG, "Deleting timer at SPLASH_STATE_RECONNECT_WIFI");
+                    splash_delete_timer(timer, __FUNCTION__);
+                }
             }
         }
-
         break;
     case SPLASH_INIT_UI:
         lv_bar_set_value(ctx.loading_bar, 100, LV_ANIM_ON);
         ctx.state = SPLASH_INIT_DONE;
-        lv_timer_del(timer);
+        ctx.timer_deleted = true;
+        splash_delete_timer(timer, __FUNCTION__);
         break;
-
+    case SPLASH_INIT_DONE:
+        // Only delete the timer once when we reach DONE state
+        ESP_LOGI(SPLASH_TAG, "Splash screen initialization complete");
+        break;
     default:
+        ESP_LOGW(SPLASH_TAG, "Unhandled state: %d", ctx.state);
         break;
     }
 }

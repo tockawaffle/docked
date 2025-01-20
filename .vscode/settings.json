@@ -51,7 +51,8 @@
         "main_splash_comps.h": "c",
         "wifi_ui.h": "c",
         "splash_screen.h": "c",
-        "splash_internal.h": "c"
+        "splash_internal.h": "c",
+        "splash_types.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"

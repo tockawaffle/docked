@@ -9,6 +9,8 @@
 
 #define SPLASH_TAG "SplashScreen"
 
+void splash_task_cb(lv_timer_t *timer);
+
 // Structure to hold WiFi button data
 typedef struct {
     char ssid[MAX_SSID_LENGTH];

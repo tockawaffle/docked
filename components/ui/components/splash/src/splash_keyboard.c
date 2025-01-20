@@ -82,8 +82,6 @@ void splash_wifi_create_password_popup(splash_ctx_t *ctx)
         // Add event callback
         lv_obj_add_event_cb(ctx->connect_btn, splash_on_password_submit, LV_EVENT_CLICKED, NULL);
 
-        lv_obj_add_event_cb(ctx->connect_btn, splash_on_password_submit, LV_EVENT_CLICKED, NULL);
-
         splash_keyboard_init(ctx);
 
         // Initially hide the popup

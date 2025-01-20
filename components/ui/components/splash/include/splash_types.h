@@ -5,6 +5,7 @@
 typedef enum {
     SPLASH_INIT_SD_CARD,
     SPLASH_INIT_WIFI,
+    SPLASH_WAIT_WIFI_INPUT,
     SPLASH_STATE_RECONNECT_WIFI,
     SPLASH_INIT_UI,
     SPLASH_INIT_DONE
@@ -20,4 +21,5 @@ typedef struct {
     lv_obj_t *connect_btn;    // Added connect button reference
     char selected_ssid[33];   
     splash_init_state_t state;
+    bool timer_deleted;
 } splash_ctx_t;

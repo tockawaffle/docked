@@ -20,6 +20,20 @@ void splash_screen_init(lv_obj_t *main_screen);
  */
 splash_ctx_t *splash_screen_get_context(void);
 
+/**
+ * @brief Set the current splash screen state
+ * @param new_ctx The new state to set
+ * @return The previous state
+ */
+splash_init_state_t splash_screen_set_state(splash_init_state_t new_ctx);
+
+/**
+ * @brief Delete a timer and log the caller function
+ * @param timer The timer to delete
+ * @param caller_function The name of the function that is deleting the timer
+ */
+void splash_delete_timer(lv_timer_t *timer, const char *caller_function);
+
 #ifdef __cplusplus
 }
 #endif
