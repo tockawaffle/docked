@@ -12,14 +12,16 @@ typedef enum {
 } splash_init_state_t;
 
 typedef struct {
+    lv_obj_t *splash_screen;
     lv_obj_t *loading_bar;
     lv_obj_t *debug_label;
-    lv_obj_t *networks_list;  
-    lv_obj_t *password_popup; 
-    lv_obj_t *password_input; 
-    lv_obj_t *keyboard;      
-    lv_obj_t *connect_btn;    // Added connect button reference
-    char selected_ssid[33];   
+    lv_obj_t *networks_list;
+    lv_obj_t *password_popup;
+    lv_obj_t *password_input;
+    lv_obj_t *keyboard;
+    lv_obj_t *connect_btn;
+    lv_obj_t *retry_btn;
+    char selected_ssid[33];
     splash_init_state_t state;
     bool timer_deleted;
 } splash_ctx_t;

@@ -9,6 +9,8 @@ idf_component_register(
         "."
         "components/splash/include"
         "components/splash/private"
+        "components/main/include"
+        "components/main/private"
     REQUIRES
         lvgl
         main

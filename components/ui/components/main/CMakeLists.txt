@@ -1,0 +1,11 @@
+idf_component_register(
+    SRCS 
+        "src/main.c"
+    INCLUDE_DIRS 
+        "include"
+        "private"
+    PRIV_INCLUDE_DIRS
+        "private"
+    REQUIRES
+        lvgl
+)

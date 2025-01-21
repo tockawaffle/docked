@@ -26,8 +26,16 @@ typedef struct
     int8_t rssis[CONFIG_EXAMPLE_SCAN_LIST_SIZE];
 } wifi_scan_result_t;
 
+typedef struct
+{
+    esp_err_t code;
+    const char *message;
+    uint8_t reason_code;
+    const char *reason_str;
+} wifi_detailed_status_t;
+
 esp_err_t wifi_init(void);
-esp_err_t wifi_connect(char *wifi_ssid, char *wifi_password);
+wifi_detailed_status_t wifi_connect(char *wifi_ssid, char *wifi_password);
 esp_err_t wifi_disconnect(void);
 esp_err_t wifi_destroy(void);
 esp_err_t wifi_restart(void);

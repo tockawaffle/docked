@@ -10,19 +10,11 @@
 #define SPLASH_TAG "SplashScreen"
 
 void splash_task_cb(lv_timer_t *timer);
-
-// Structure to hold WiFi button data
-typedef struct {
-    char ssid[MAX_SSID_LENGTH];
-    int32_t rssi;
-} wifi_button_data_t;
-
-// WiFi UI functions
 void splash_wifi_create_network_list(splash_ctx_t *ctx, wifi_scan_result_t *scan_result);
 void splash_wifi_create_password_popup(splash_ctx_t *ctx);
 void splash_cleanup_wifi_list(splash_ctx_t *ctx);
-
-// Event callbacks
+void splash_handle_wifi_retry(lv_event_t *e);
+void splash_handle_scan_networks(lv_event_t *e);
 void splash_on_wifi_button_click(lv_event_t *e);
 void splash_on_password_submit(lv_event_t *e);
 void splash_on_password_toggle(lv_event_t *e);
