@@ -41,10 +41,10 @@ void splash_screen_init()
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_row(cont, 20, 0);
 
-    lv_obj_t *gear_label = lv_label_create(cont);
-    lv_obj_set_style_text_font(gear_label, &lv_font_montserrat_48, 0);
-    lv_obj_set_style_text_color(gear_label, lv_color_hex(COLOR_PRIMARY), 0);
-    lv_label_set_text(gear_label, LV_SYMBOL_SETTINGS);
+    lv_obj_t *logo_img = lv_img_create(cont);
+    lv_img_set_src(logo_img, &logo);
+    lv_obj_set_size(logo_img, 200, 200);
+
 
     ctx.loading_bar = lv_bar_create(cont);
     lv_obj_set_size(ctx.loading_bar, 380, 20);
@@ -180,16 +180,20 @@ void splash_task_cb(lv_timer_t *timer)
 
     case SPLASH_INIT_UI:
         lv_bar_set_value(ctx.loading_bar, 100, LV_ANIM_ON);
-        ctx.state = SPLASH_INIT_DONE;
-        ctx.timer_deleted = true;
-        splash_delete_timer(timer, __FUNCTION__);
+        splash_screen_set_state(SPLASH_INIT_DONE);
+
         break;
 
     case SPLASH_INIT_DONE:
         // Now we start the cleanup process and remove the splash screen
         lv_obj_del(ctx.splash_screen);
+        // Free the ctx object
+        memset(&ctx, 0, sizeof(ctx));
+        // Stop the timer
+        splash_delete_timer(timer, __FUNCTION__);
 
         // Start the main UI
+        main_screen_init();
 
         break;
 

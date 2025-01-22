@@ -54,7 +54,8 @@
         "splash_internal.h": "c",
         "splash_types.h": "c",
         "format": "c",
-        "main_internals.h": "c"
+        "main_internals.h": "c",
+        "logo.h": "c"
     },
     "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
     "idf.toolsPath": "/home/tocka/.espressif"

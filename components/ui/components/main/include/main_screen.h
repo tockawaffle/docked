@@ -8,3 +8,8 @@
 extern "C"
 {
 #endif
+
+    /**
+     * @brief Initialize and display the main screen
+     */
+    void main_screen_init();

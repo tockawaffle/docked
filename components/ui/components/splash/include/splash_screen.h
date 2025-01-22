@@ -3,6 +3,8 @@
 #include <esp_err.h>
 #include <lvgl.h>
 #include "splash_types.h"
+#include "main_screen.h"
+#include "logo.h"
 
 #ifdef __cplusplus
 extern "C"

@@ -1,9 +1,12 @@
 #include "sd_card.h"
 #include "lv_fs.h"
+#include <dirent.h>
 
 static sdmmc_card_t *card;
 static const char mount_point[] = MOUNT_POINT;
 static sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+
+#define LOG_FILES 1
 
 static esp_err_t s_example_write_file(const char *path, char *data)
 {
@@ -19,6 +22,89 @@ static esp_err_t s_example_write_file(const char *path, char *data)
     ESP_LOGI(SD_TAG, "File written");
 
     return ESP_OK;
+}
+
+esp_err_t list_files_recursive(const char *base_path, int level)
+{
+    esp_err_t ret = ESP_OK;
+
+    // Open directory
+    DIR *dir = opendir(base_path);
+    if (!dir)
+    {
+        ESP_LOGE(SD_TAG, "Failed to open directory %s", base_path);
+        return ESP_FAIL;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        char *full_path = NULL;
+        // Dynamically allocate and create full path
+        if (asprintf(&full_path, "%s/%s", base_path, entry->d_name) == -1)
+        {
+            ESP_LOGE(SD_TAG, "Failed to allocate path buffer");
+            ret = ESP_ERR_NO_MEM;
+            break;
+        }
+
+        // Get file information
+        struct stat st;
+        if (stat(full_path, &st) == -1)
+        {
+            ESP_LOGE(SD_TAG, "Failed to stat %s", full_path);
+            free(full_path);
+            continue;
+        }
+
+        // Print indentation
+        for (int i = 0; i < level; i++)
+        {
+            printf("  ");
+        }
+
+        if (S_ISDIR(st.st_mode))
+        {
+            // Directory
+            ESP_LOGI(SD_TAG, "DIR: %s", entry->d_name);
+
+            // Skip "." and ".." directories
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                // Recursively process subdirectory
+                esp_err_t subdir_ret = list_files_recursive(full_path, level + 1);
+                if (subdir_ret != ESP_OK)
+                {
+                    ret = subdir_ret;
+                }
+            }
+        }
+        else
+        {
+            // Regular file
+            ESP_LOGI(SD_TAG, "FILE: %s (%lld bytes)", entry->d_name, (long long)st.st_size);
+        }
+
+        free(full_path);
+    }
+
+    closedir(dir);
+    return ret;
+}
+
+// Usage in your application:
+static esp_err_t scan_sd_card(const char *mount_point)
+{
+    ESP_LOGI(SD_TAG, "Scanning files on SD card...");
+
+    esp_err_t ret = list_files_recursive(mount_point, 0);
+
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(SD_TAG, "Error scanning SD card: %s", esp_err_to_name(ret));
+    }
+
+    return ret;
 }
 
 /**
@@ -124,6 +210,10 @@ esp_err_t sd_card_init(void)
     ESP_LOGI(SD_TAG, "Name: %s", card->cid.name);
     ESP_LOGI(SD_TAG, "Capacity: %lluMB", ((uint64_t)card->csd.capacity) * card->csd.sector_size / (1024 * 1024));
     ESP_LOGI(SD_TAG, "Sector size: %d", card->csd.sector_size);
+
+#ifdef LOG_FILES
+    scan_sd_card(mount_point);
+#endif
 
     ESP_LOGI(SD_TAG, "SD Card mounted successfully");
 
