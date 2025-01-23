@@ -13,6 +13,11 @@ splash_init_state_t splash_screen_set_state(splash_init_state_t new_ctx)
     splash_init_state_t old_state = ctx.state;
     ctx.state = new_ctx;
     ESP_LOGI(SPLASH_TAG, "State changed from %d to %d", old_state, new_ctx);
+    if (ctx.timer_deleted)
+    {
+        ctx.timer_deleted = false;
+        lv_timer_create(splash_task_cb, 500, NULL);
+    }
     return old_state;
 }
 
@@ -44,7 +49,6 @@ void splash_screen_init()
     lv_obj_t *logo_img = lv_img_create(cont);
     lv_img_set_src(logo_img, &logo);
     lv_obj_set_size(logo_img, 200, 200);
-
 
     ctx.loading_bar = lv_bar_create(cont);
     lv_obj_set_size(ctx.loading_bar, 380, 20);
@@ -83,6 +87,10 @@ void splash_handle_wifi_retry(lv_event_t *e)
 
 void splash_handle_scan_networks(lv_event_t *e)
 {
+    if (ctx.retry_btn)
+    {
+        lv_obj_add_flag(ctx.retry_btn, LV_OBJ_FLAG_HIDDEN);
+    }
     wifi_scan_result_t scan_result = wifi_scan();
     if (scan_result.status != ESP_OK)
     {
@@ -177,24 +185,67 @@ void splash_task_cb(lv_timer_t *timer)
         ctx.state = SPLASH_INIT_UI;
         break;
     }
+    case SPLASH_STATE_RECONNECT_WIFI:
+        lv_label_set_text(ctx.debug_label, "Debug: Reconnecting to Wi-Fi...");
+
+        wifi_credentials_t wifi_credentials;
+        ret = read_wifi_config(&wifi_credentials);
+
+        if (ret != ESP_OK)
+        {
+            lv_label_set_text(ctx.debug_label, "Debug: Failed to re-read Wi-Fi configuration. Please try again.");
+            if (!ctx.retry_btn)
+            {
+                lv_obj_t *parent = lv_obj_get_parent(ctx.debug_label);
+                ctx.retry_btn = lv_btn_create(parent);
+                lv_obj_t *btn_label = lv_label_create(ctx.retry_btn);
+                lv_label_set_text(btn_label, "Try Again");
+                lv_obj_center(btn_label);
+                lv_obj_add_event_cb(ctx.retry_btn, splash_handle_scan_networks, LV_EVENT_CLICKED, NULL);
+            }
+            lv_obj_clear_flag(ctx.retry_btn, LV_OBJ_FLAG_HIDDEN);
+            goto cleanup;
+            break;
+        }
+
+        ESP_LOGW(SPLASH_TAG, "SSID: %s, Password: %s", wifi_credentials.ssid, wifi_credentials.password);
+        wifi_detailed_status_t status = wifi_connect(wifi_credentials.ssid, wifi_credentials.password);
+        if (status.code != ESP_OK)
+        {
+            lv_label_set_text_fmt(ctx.debug_label, "Debug: Failed to connect to %s: %s",
+                                  ctx.selected_ssid, status.message);
+            lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0xFF0000), 0);
+            goto cleanup;
+            break;
+        }
+
+        lv_label_set_text_fmt(ctx.debug_label, "Debug: Connected to %s successfully", ctx.selected_ssid);
+        lv_obj_set_style_text_color(ctx.debug_label, lv_color_hex(0x00FF00), 0);
+        ctx.state = SPLASH_INIT_UI;
+        break;
 
     case SPLASH_INIT_UI:
         lv_bar_set_value(ctx.loading_bar, 100, LV_ANIM_ON);
-        splash_screen_set_state(SPLASH_INIT_DONE);
+        ctx.state = SPLASH_INIT_DONE;
 
         break;
 
     case SPLASH_INIT_DONE:
-        // Now we start the cleanup process and remove the splash screen
-        lv_obj_del(ctx.splash_screen);
-        // Free the ctx object
-        memset(&ctx, 0, sizeof(ctx));
-        // Stop the timer
+        // Delete existing timer first
         splash_delete_timer(timer, __FUNCTION__);
+        ctx.timer_deleted = true;
 
-        // Start the main UI
+        // Save UI elements before context clear
+        lv_obj_t *screen_to_delete = ctx.splash_screen;
+
+        // Clear context immediately to prevent new timer creation
+        memset(&ctx, 0, sizeof(ctx));
+
+        // Initialize main screen first
         main_screen_init();
 
+        // Delete old screen last
+        lv_obj_del(screen_to_delete);
         break;
 
     case SPLASH_WAIT_WIFI_INPUT:
@@ -207,6 +258,6 @@ void splash_task_cb(lv_timer_t *timer)
     return;
 
 cleanup:
-    ctx.timer_deleted = true;
     splash_delete_timer(timer, __FUNCTION__);
+    ctx.timer_deleted = true;
 }
