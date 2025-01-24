@@ -1,5 +1,4 @@
 
-
 <div align="center">
 
 # Docked
@@ -46,6 +45,12 @@ $ sudo chmod 666 /dev/PORT # PORT needs to be the port that it was connected as,
 $ idf.py -p /dev/PORT flash # This will build AND flash the current plugged device.
 ```
 </details>
+
+---
+
+## Additional Information
+
+The GitHub repo is a mirror to the original. The original lives at [my Gitea repo](https://git.sipher.space/decksterity/docked)
 
 ---
 
