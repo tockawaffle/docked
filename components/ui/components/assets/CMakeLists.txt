@@ -9,6 +9,7 @@ idf_component_register(
     INCLUDE_DIRS
         "."                # Include the parent directory
         "logos"            # Explicitly include the logos folder
+        "icons"
     REQUIRES
         lvgl
         main

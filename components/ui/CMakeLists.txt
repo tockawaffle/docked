@@ -13,6 +13,7 @@ idf_component_register(
         "components/main/private"
         "components/assets/"
         "components/assets/logos"
+        "components/assets/icons"
     REQUIRES
         lvgl
         main

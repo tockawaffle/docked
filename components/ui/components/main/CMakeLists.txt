@@ -1,6 +1,7 @@
 idf_component_register(
     SRCS 
         "src/main.c"
+        "src/sidebar.c"
     INCLUDE_DIRS 
         "include"
         "private"
