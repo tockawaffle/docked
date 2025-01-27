@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "ms-vscode-remote.remote-wsl",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "twxs.cmake",
+        "kylinideteam.cmake-intellisence",
+        "ms-vscode.cmake-tools",
+        "espressif.esp-idf-extension",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.vscode-serial-monitor"
+    ]
+}
