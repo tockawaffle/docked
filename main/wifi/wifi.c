@@ -459,3 +459,37 @@ wifi_scan_result_t wifi_scan(void)
     ESP_LOGI(WIFI_TAG, "Number of access points found: %d", result.ap_count);
     return result;
 }
+
+get_wifi_t get_wifi(void)
+{
+    get_wifi_t result;
+    result.status = ESP_OK;
+    result.current_state = WIFI_DISCONNECTED;
+    memset(result.network, 0, sizeof(result.network));
+
+    wifi_ap_record_t ap_info;
+
+    // Get current WiFi state
+    wifi_mode_t mode;
+    result.status = esp_wifi_get_mode(&mode);
+    if (result.status != ESP_OK)
+    {
+        return result;
+    }
+
+    // Check if WiFi is in station mode
+    if (mode != WIFI_MODE_STA)
+    {
+        return result;
+    }
+
+    // Check if we're connected
+    if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK)
+    {
+        result.current_state = WIFI_CONNECTED;
+        strncpy(result.network, (char *)ap_info.ssid, sizeof(result.network) - 1);
+        result.network[sizeof(result.network) - 1] = '\0';
+    }
+
+    return result;
+}

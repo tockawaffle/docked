@@ -8,6 +8,7 @@
 #include "nvs_flash.h"
 #include <inttypes.h>
 #include "regex.h"
+#include "main_types.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -22,9 +23,16 @@ typedef struct
 {
     esp_err_t status;
     uint16_t ap_count;
-    char ssids[CONFIG_EXAMPLE_SCAN_LIST_SIZE][33]; // 32 chars + null terminator
+    char ssids[CONFIG_EXAMPLE_SCAN_LIST_SIZE][33];
     int8_t rssis[CONFIG_EXAMPLE_SCAN_LIST_SIZE];
 } wifi_scan_result_t;
+
+typedef struct
+{
+    esp_err_t status;
+    wifi_state_t current_state;
+    char network[33];
+} get_wifi_t;
 
 typedef struct
 {
@@ -40,3 +48,4 @@ esp_err_t wifi_disconnect(void);
 esp_err_t wifi_destroy(void);
 esp_err_t wifi_restart(void);
 wifi_scan_result_t wifi_scan(void);
+get_wifi_t get_wifi(void);
