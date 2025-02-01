@@ -66,7 +66,7 @@
 
 esp_err_t lcd_init();
 
-esp_err_t wavesahre_rgb_lcd_bl_on();
-esp_err_t wavesahre_rgb_lcd_bl_off();
+esp_err_t rgb_lcd_bl_on();
+esp_err_t rgb_lcd_bl_off();
 
 #endif

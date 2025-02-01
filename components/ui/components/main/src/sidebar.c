@@ -1,6 +1,8 @@
 #include "main_internals.h"
 #include "menu_internals.h"
 
+#include <esp_sleep.h>
+
 #define SIDEBAR_TAG "Sidebar"
 
 static void wifi_clicked_cb(lv_event_t *e)
@@ -9,12 +11,19 @@ static void wifi_clicked_cb(lv_event_t *e)
         return;
     // TODO: Implement WiFi toggle
 }
+
 static void power_off_ev(lv_event_t *e)
 {
     lv_obj_t *dialog = lv_event_get_user_data(e);
     lv_obj_del(dialog);
-    // TODO: Implement power off
     ESP_LOGI(SIDEBAR_TAG, "Power off confirmed");
+
+    // Update (31/01/2024): This is the best way of doing this. Deep sleep. Good night chat :vedalBedge:
+    // To turn it back on just press the "Reset" button I guess.
+    lv_obj_del(ctx.main_screen); // I guess we can also just delete everything from the current context.
+    rgb_lcd_bl_off();            // Turns off the back light of the LCD
+    esp_deep_sleep_start();      // Deep sleep it.
+    // This is not a true "power off", but it's the best (only) way of doing this.
 }
 
 static void power_clicked_cb(lv_event_t *e)
@@ -244,6 +253,7 @@ lv_obj_t *create_sidebar(lv_obj_t *main_screen)
 {
     if (!main_screen)
         return NULL;
+    ctx.main_screen = main_screen;
 
     lv_obj_t *main_cont = lv_obj_create(main_screen);
     lv_obj_remove_style_all(main_cont);
@@ -323,6 +333,9 @@ lv_obj_t *create_sidebar(lv_obj_t *main_screen)
 
     // Create menu context
     create_menu_ctx(main_cont);
+    get_wifi_t ret = get_wifi();
+    ctx.wifi_state = ret.current_state;
+    update_wifi_indicator();
 
     return sidebar;
 }

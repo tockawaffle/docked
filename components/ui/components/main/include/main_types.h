@@ -50,6 +50,7 @@ typedef struct
 
 typedef struct
 {
+    lv_obj_t *main_screen; // For turn off reasons only.
     lv_obj_t *sidebar;
     lv_obj_t *active_btn;
     lv_obj_t *wifi_indicator;

@@ -74,7 +74,7 @@ void waveshare_esp32_s3_touch_reset()
 esp_err_t lcd_init()
 {
     ESP_LOGI(LCD_TAG, "Install RGB LCD panel driver"); // Log the start of the RGB LCD panel driver installation
-    esp_lcd_panel_handle_t panel_handle = NULL;    // Declare a handle for the LCD panel
+    esp_lcd_panel_handle_t panel_handle = NULL;        // Declare a handle for the LCD panel
     esp_lcd_rgb_panel_config_t panel_config = {
         .clk_src = LCD_CLK_SRC_DEFAULT, // Set the clock source for the panel
         .timings = {
@@ -128,22 +128,22 @@ esp_err_t lcd_init()
     // Create a new RGB panel with the specified configuration
     ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &panel_handle));
 
-    ESP_LOGI(LCD_TAG, "Initialize RGB LCD panel");         // Log the initialization of the RGB LCD panel
+    ESP_LOGI(LCD_TAG, "Initialize RGB LCD panel");     // Log the initialization of the RGB LCD panel
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle)); // Initialize the LCD panel
 
     esp_lcd_touch_handle_t tp_handle = NULL; // Declare a handle for the touch panel
 #if CONFIG_EXAMPLE_LCD_TOUCH_CONTROLLER_GT911
     ESP_LOGI(LCD_TAG, "Initialize I2C bus");   // Log the initialization of the I2C bus
-    i2c_master_init();                     // Initialize the I2C master
+    i2c_master_init();                         // Initialize the I2C master
     ESP_LOGI(LCD_TAG, "Initialize GPIO");      // Log GPIO initialization
-    gpio_init();                           // Initialize GPIO pins
+    gpio_init();                               // Initialize GPIO pins
     ESP_LOGI(LCD_TAG, "Initialize Touch LCD"); // Log touch LCD initialization
-    waveshare_esp32_s3_touch_reset();      // Reset the touch panel
+    waveshare_esp32_s3_touch_reset();          // Reset the touch panel
 
     esp_lcd_panel_io_handle_t tp_io_handle = NULL;                                          // Declare a handle for touch panel I/O
     const esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG(); // Configure I2C for GT911 touch controller
 
-    ESP_LOGI(LCD_TAG, "Initialize I2C panel IO");                                                                          // Log I2C panel I/O initialization
+    ESP_LOGI(LCD_TAG, "Initialize I2C panel IO");                                                                      // Log I2C panel I/O initialization
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)I2C_MASTER_NUM, &tp_io_config, &tp_io_handle)); // Create new I2C panel I/O
 
     ESP_LOGI(LCD_TAG, "Initialize touch controller GT911"); // Log touch controller initialization
@@ -181,7 +181,7 @@ esp_err_t lcd_init()
 }
 
 /******************************* Turn on the screen backlight **************************************/
-esp_err_t wavesahre_rgb_lcd_bl_on()
+esp_err_t rgb_lcd_bl_on()
 {
     // Configure CH422G to output mode
     uint8_t write_buf = 0x01;
@@ -194,7 +194,7 @@ esp_err_t wavesahre_rgb_lcd_bl_on()
 }
 
 /******************************* Turn off the screen backlight **************************************/
-esp_err_t wavesahre_rgb_lcd_bl_off()
+esp_err_t rgb_lcd_bl_off()
 {
     // Configure CH422G to output mode
     uint8_t write_buf = 0x01;
