@@ -32,6 +32,7 @@ typedef struct
     esp_err_t status;
     wifi_state_t current_state;
     char network[33];
+    int8_t rssi;
 } get_wifi_t;
 
 typedef struct

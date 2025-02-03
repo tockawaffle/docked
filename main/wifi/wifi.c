@@ -401,7 +401,7 @@ wifi_scan_result_t wifi_scan(void)
     wifi_scan_result_t result = {
         .status = ESP_OK,
         .ap_count = 0,
-        .ssids = {{0}}, // Initialize arrays to zero
+        .ssids = {{0}},
         .rssis = {0}};
 
     uint16_t number = DEFAULT_SCAN_LIST_SIZE;
@@ -465,6 +465,7 @@ get_wifi_t get_wifi(void)
     get_wifi_t result;
     result.status = ESP_OK;
     result.current_state = WIFI_DISCONNECTED;
+    result.rssi = 0; // Initialize RSSI
     memset(result.network, 0, sizeof(result.network));
 
     wifi_ap_record_t ap_info;
@@ -489,6 +490,7 @@ get_wifi_t get_wifi(void)
         result.current_state = WIFI_CONNECTED;
         strncpy(result.network, (char *)ap_info.ssid, sizeof(result.network) - 1);
         result.network[sizeof(result.network) - 1] = '\0';
+        result.rssi = ap_info.rssi;
     }
 
     return result;

@@ -50,15 +50,20 @@ typedef struct
 
 typedef struct
 {
-    lv_obj_t *main_screen; // For turn off reasons only.
+    struct
+    {
+        volatile wifi_state_t state;
+        volatile char name[33];
+        volatile int8_t signal_strength;
+    } wifi;
+
+    lv_obj_t *main_screen;
     lv_obj_t *sidebar;
     lv_obj_t *active_btn;
     lv_obj_t *wifi_indicator;
-    volatile wifi_state_t wifi_state;
     uint32_t button_count;
     uint32_t checksum;
 } sidebar_ctx_t;
-
 typedef struct
 {
     lv_obj_t *menu_cont;

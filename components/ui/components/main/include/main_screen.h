@@ -22,7 +22,10 @@ extern "C"
 
     static sidebar_ctx_t ctx = {
         .button_count = 0,
-        .wifi_state = WIFI_DISCONNECTED,
+        .wifi = {
+            .signal_strength = 0,
+            .name = "",
+            .state = WIFI_DISCONNECTED},
         .active_btn = NULL,
         .checksum = 0};
 
@@ -47,6 +50,14 @@ extern "C"
         .menu_cont = NULL,
         .current_menu = NULL,
         .is_open = false};
+
+    struct wifi_state_style
+    {
+        const char *symbol;
+        lv_color_t color;
+    };
+
+    static struct wifi_state_style WIFI_STATES[2];
 
 #ifdef __cplusplus
 }

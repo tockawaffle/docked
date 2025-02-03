@@ -9,7 +9,20 @@ static void wifi_clicked_cb(lv_event_t *e)
 {
     if (lv_event_get_code(e) != LV_EVENT_PRESSED)
         return;
-    // TODO: Implement WiFi toggle
+
+    static lv_obj_t *info_panel = NULL;
+
+    if (ctx.wifi.state == WIFI_CONNECTED)
+    {
+        if (!info_panel)
+        {
+            info_panel = create_info_panel(lv_scr_act());
+        }
+        if (info_panel)
+        {
+            toggle_info_panel(info_panel);
+        }
+    }
 }
 
 static void power_off_ev(lv_event_t *e)
@@ -62,7 +75,7 @@ static void create_bottom_buttons(lv_obj_t *sidebar)
     lv_label_set_text(wifi_label, LV_SYMBOL_WIFI);
     lv_obj_center(wifi_label);
     lv_obj_set_style_text_color(wifi_label,
-                                ctx.wifi_state == WIFI_CONNECTED ? lv_color_hex(0x00FF00) : lv_color_hex(0xFF0000),
+                                ctx.wifi.state == WIFI_CONNECTED ? lv_color_hex(0x00FF00) : lv_color_hex(0xFF0000),
                                 LV_PART_MAIN);
 
     // Power button
@@ -154,17 +167,35 @@ static bool validate_button_data(const sidebar_btn_t *btn)
     return true;
 }
 
+static void init_wifi_states(void)
+{
+    static bool initialized = false;
+    if (initialized)
+        return;
+
+    WIFI_STATES[WIFI_CONNECTED].symbol = LV_SYMBOL_WIFI;
+    WIFI_STATES[WIFI_CONNECTED].color = lv_color_hex(COLOR_SUCCESS);
+
+    WIFI_STATES[WIFI_DISCONNECTED].symbol = LV_SYMBOL_CLOSE;
+    WIFI_STATES[WIFI_DISCONNECTED].color = lv_color_hex(COLOR_DESTRUCTIVE);
+
+    initialized = true;
+}
+
 static void update_wifi_indicator(void)
 {
     if (!ctx.wifi_indicator)
         return;
 
-    const char *wifi_symbol = (ctx.wifi_state == WIFI_CONNECTED) ? LV_SYMBOL_WIFI : LV_SYMBOL_CLOSE;
     lv_obj_t *label = lv_obj_get_child(ctx.wifi_indicator, 0);
-    if (label)
-    {
-        lv_label_set_text(label, wifi_symbol);
-    }
+    if (!label)
+        return;
+
+    init_wifi_states();
+
+    // Update label text and color based on state
+    lv_label_set_text(label, WIFI_STATES[ctx.wifi.state].symbol);
+    lv_obj_set_style_text_color(label, WIFI_STATES[ctx.wifi.state].color, LV_PART_MAIN);
 }
 
 lv_obj_t *create_sidebar_button(lv_obj_t *parent, sidebar_btn_t *btn_data)
@@ -334,7 +365,9 @@ lv_obj_t *create_sidebar(lv_obj_t *main_screen)
     // Create menu context
     create_menu_ctx(main_cont);
     get_wifi_t ret = get_wifi();
-    ctx.wifi_state = ret.current_state;
+    ctx.wifi.signal_strength = ret.rssi;
+    strncpy((char *)ctx.wifi.name, ret.network, sizeof(ctx.wifi.name) - 1);
+    ctx.wifi.state = ret.current_state;
     update_wifi_indicator();
 
     return sidebar;

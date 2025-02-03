@@ -4,6 +4,8 @@
 #include "menu_internals.h"
 
 static lv_obj_t *active_menu = NULL;
+static char wifi_name_buf[50];
+static char signal_str_buf[50];
 
 lv_obj_t *create_slide_menu(lv_obj_t *parent, const menu_def_t *menu_def)
 {
@@ -77,17 +79,88 @@ lv_obj_t *create_slide_menu(lv_obj_t *parent, const menu_def_t *menu_def)
     return menu;
 }
 
+// Create a function specifically for info panels
+lv_obj_t *create_info_panel(lv_obj_t *parent)
+{
+    if (!parent)
+        return NULL;
+
+    // Create base container
+    lv_obj_t *panel = lv_obj_create(parent);
+    if (!panel)
+        return NULL;
+
+    lv_obj_remove_style_all(panel);
+    lv_obj_set_size(panel, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(panel, SIDEBAR_WIDTH + SPACING_UNIT, SPACING_UNIT); // Position next to sidebar
+    lv_obj_add_flag(panel, LV_OBJ_FLAG_HIDDEN);
+
+    // Panel styling
+    lv_obj_set_style_bg_color(panel, lv_color_hex(COLOR_BACKGROUND), 0);
+    lv_obj_set_style_bg_opa(panel, LV_OPA_COVER, 0);
+    lv_obj_set_style_pad_all(panel, SPACING_UNIT * 2, 0);
+    lv_obj_set_style_radius(panel, BORDER_RADIUS, 0);
+    lv_obj_set_style_border_width(panel, 2, 0);
+    lv_obj_set_style_border_color(panel, lv_color_hex(COLOR_PRIMARY), 0);
+    lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_COLUMN);
+
+    // Update info text
+    snprintf(wifi_name_buf, sizeof(wifi_name_buf), "Network: %s", ctx.wifi.name);
+    snprintf(signal_str_buf, sizeof(signal_str_buf), "Signal: %d dBm", ctx.wifi.signal_strength);
+
+    // Create each text line
+    lv_obj_t *title = lv_label_create(panel);
+    lv_label_set_text(title, "WiFi Details");
+    lv_obj_set_style_text_color(title, lv_color_hex(COLOR_FOREGROUND), 0);
+    lv_obj_set_style_text_font(title, &lv_font_montserrat_20, 0);
+    lv_obj_set_style_pad_bottom(title, SPACING_UNIT, 0);
+
+    lv_obj_t *network = lv_label_create(panel);
+    lv_label_set_text(network, wifi_name_buf);
+    lv_obj_set_style_text_color(network, lv_color_hex(COLOR_FOREGROUND), 0);
+
+    lv_obj_t *signal = lv_label_create(panel);
+    lv_label_set_text(signal, signal_str_buf);
+    lv_obj_set_style_text_color(signal, lv_color_hex(COLOR_FOREGROUND), 0);
+
+    return panel;
+}
+
+void toggle_info_panel(lv_obj_t *panel)
+{
+    if (!panel)
+        return;
+
+    if (lv_obj_has_flag(panel, LV_OBJ_FLAG_HIDDEN))
+    {
+        lv_obj_clear_flag(panel, LV_OBJ_FLAG_HIDDEN);
+    }
+    else
+    {
+        lv_obj_add_flag(panel, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
 void show_menu(lv_obj_t *menu)
 {
     if (!menu)
         return;
 
-    if (active_menu)
+    // If this menu is currently visible, hide it
+    if (menu == active_menu && !lv_obj_has_flag(menu, LV_OBJ_FLAG_HIDDEN))
     {
-        ESP_LOGW("Menus", "Menu shown");
+        lv_obj_add_flag(menu, LV_OBJ_FLAG_HIDDEN);
+        active_menu = NULL;
+        return;
+    }
+
+    // If there's another menu visible, hide it
+    if (active_menu && active_menu != menu)
+    {
         lv_obj_add_flag(active_menu, LV_OBJ_FLAG_HIDDEN);
     }
 
+    // Show this menu
     lv_obj_clear_flag(menu, LV_OBJ_FLAG_HIDDEN);
     active_menu = menu;
 
@@ -96,12 +169,10 @@ void show_menu(lv_obj_t *menu)
     lv_anim_init(&a);
     lv_anim_set_var(&a, menu);
     lv_anim_set_time(&a, MENU_ANIM_TIME);
-
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_set_values(&a, -MENU_WIDTH, 0);
     lv_anim_start(&a);
 }
-
 void close_active_menu(void)
 {
     if (!active_menu)
@@ -139,6 +210,7 @@ lv_obj_t *create_confirmation_dialog(const char *message, lv_event_cb_t confirm_
 
     lv_obj_t *label = lv_label_create(content);
     lv_label_set_text(label, message);
+    lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), 0);
 
     lv_obj_t *btn_container = lv_obj_create(content);
     lv_obj_remove_style_all(btn_container);
