@@ -1,15 +1,16 @@
 idf_component_register(
     SRCS 
-        "src/splash_screen.c"
-        "src/splash_wifi.c"
-        "src/splash_keyboard.c"
+        "src/sd_card.c"
+        "src/lv_fs.c"
     INCLUDE_DIRS 
         "include"
-        "private"
     PRIV_INCLUDE_DIRS
         "private"
     REQUIRES
         lvgl
-        server
-        
+        fatfs
+        vfs
+        sdmmc
+        freertos
+        main
 )

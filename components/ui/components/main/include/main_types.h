@@ -3,6 +3,7 @@
 #include <lvgl.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "wifi_c_types.h"
 
 // Version control for ABI compatibility
 #define SIDEBAR_API_VERSION 1
@@ -24,10 +25,6 @@
 typedef uint8_t sidebar_icon_type_t;
 #define SIDEBAR_ICON_SYMBOL ((sidebar_icon_type_t)0)
 #define SIDEBAR_ICON_IMAGE ((sidebar_icon_type_t)1)
-
-typedef uint8_t wifi_state_t;
-#define WIFI_CONNECTED ((wifi_state_t)0)
-#define WIFI_DISCONNECTED ((wifi_state_t)1)
 
 // Validation macros
 #define IS_VALID_ICON_TYPE(type) ((type) == SIDEBAR_ICON_SYMBOL || (type) == SIDEBAR_ICON_IMAGE)
@@ -64,6 +61,7 @@ typedef struct
     uint32_t button_count;
     uint32_t checksum;
 } sidebar_ctx_t;
+
 typedef struct
 {
     lv_obj_t *menu_cont;

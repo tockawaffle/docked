@@ -1,0 +1,17 @@
+idf_component_register(
+    SRCS
+        "src/wifi.c"
+        "src/wifi_context.c"
+        "src/wifi_storage.c"
+    INCLUDE_DIRS
+        "."
+        "include"
+    PRIV_INCLUDE_DIRS
+        "private"
+    REQUIRES
+        freertos
+        esp_wifi
+        esp_netif
+        nvs_flash
+        ui
+)

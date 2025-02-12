@@ -5,6 +5,11 @@
 
 #define SIDEBAR_TAG "Sidebar"
 
+sidebar_ctx_t get_sidebar_ctx(void)
+{
+    return ctx;
+}
+
 static void wifi_clicked_cb(lv_event_t *e)
 {
     if (lv_event_get_code(e) != LV_EVENT_PRESSED)
@@ -12,16 +17,15 @@ static void wifi_clicked_cb(lv_event_t *e)
 
     static lv_obj_t *info_panel = NULL;
 
-    if (ctx.wifi.state == WIFI_CONNECTED)
-    {
-        if (!info_panel)
-        {
-            info_panel = create_info_panel(lv_scr_act());
+    if (ctx.wifi.state == WIFI_CONNECTED) {
+        if (!info_panel) {
+            info_panel = create_info_panel(lv_scr_act(), get_sidebar_ctx());
+            if (!info_panel) {
+                ESP_LOGE(SIDEBAR_TAG, "Failed to create info panel");
+                return;
+            }
         }
-        if (info_panel)
-        {
-            toggle_info_panel(info_panel);
-        }
+        toggle_info_panel(info_panel);
     }
 }
 
@@ -193,9 +197,10 @@ static void update_wifi_indicator(void)
 
     init_wifi_states();
 
-    // Update label text and color based on state
-    lv_label_set_text(label, WIFI_STATES[ctx.wifi.state].symbol);
-    lv_obj_set_style_text_color(label, WIFI_STATES[ctx.wifi.state].color, LV_PART_MAIN);
+    const wifi_context_t *wifi_ctx = get_wifi_context();
+
+    lv_label_set_text(label, WIFI_STATES[wifi_ctx->state].symbol);
+    lv_obj_set_style_text_color(label, WIFI_STATES[wifi_ctx->state].color, LV_PART_MAIN);
 }
 
 lv_obj_t *create_sidebar_button(lv_obj_t *parent, sidebar_btn_t *btn_data)
@@ -305,7 +310,7 @@ lv_obj_t *create_sidebar(lv_obj_t *main_screen)
     // Create top section container
     lv_obj_t *top_section = lv_obj_create(sidebar);
     lv_obj_remove_style_all(top_section);
-    lv_obj_set_size(top_section, LV_PCT(100), LV_PCT(85)); // Use 85% of height for top section
+    lv_obj_set_size(top_section, LV_PCT(100), LV_PCT(85));
     lv_obj_set_flex_flow(top_section, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(top_section, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_all(top_section, 0, LV_PART_MAIN);
@@ -364,10 +369,10 @@ lv_obj_t *create_sidebar(lv_obj_t *main_screen)
 
     // Create menu context
     create_menu_ctx(main_cont);
-    get_wifi_t ret = get_wifi();
-    ctx.wifi.signal_strength = ret.rssi;
-    strncpy((char *)ctx.wifi.name, ret.network, sizeof(ctx.wifi.name) - 1);
-    ctx.wifi.state = ret.current_state;
+    const wifi_context_t *wifi_ctx = get_wifi_context();
+    ctx.wifi.signal_strength = wifi_ctx->rssi;
+    strncpy((char *)ctx.wifi.name, wifi_ctx->ssid, sizeof(ctx.wifi.name) - 1);
+    ctx.wifi.state = wifi_ctx->state;
     update_wifi_indicator();
 
     return sidebar;

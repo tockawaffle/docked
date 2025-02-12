@@ -1,0 +1,34 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "idf.espIdfPath": "/home/tocka/esp/v5.4/esp-idf",
+        "idf.customExtraPaths": "${env:PATH}:/home/tocka/.espressif/tools/xtensa-esp32s3-elf/esp-2022r1-11.2.0/xtensa-esp32s3-elf/bin:/home/tocka/.espressif/tools/xtensa-esp32s3-elf/esp-2022r1-11.2.0/xtensa-esp32s3-elf/bin:/home/tocka/.espressif/python_env/idf5.4_py3.10_env/bin:/home/tocka/esp/v5.4/esp-idf/tools",
+        "idf.pythonBinPath": "/home/tocka/.espressif/python_env/idf5.4_py3.10_env/bin/python",
+        "idf.toolsPath": "/home/tocka/.espressif",
+        "idf.port": "/dev/ttyACM0",
+        "idf.flashType": "UART",
+        "idf.adapterTargetName": "esp32s3",
+        "idf.openOcdConfigs": [
+            "board/esp32s3-builtin.cfg"
+        ],
+        "C_Cpp.intelliSenseEngine": "default",
+        "C_Cpp.default.includePath": [
+            "${workspaceFolder}/**",
+            "${config:idf.espIdfPath}/**"
+        ],
+        "cmake.configureEnvironment": {
+            "IDF_PATH": "${config:idf.espIdfPath}",
+            "IDF_TARGET": "esp32s3"
+        },
+        "files.associations": {
+            "*.h": "c",
+            "chrono": "c",
+            "text_encoding": "c",
+            "typeinfo": "c"
+        }
+    }
+}

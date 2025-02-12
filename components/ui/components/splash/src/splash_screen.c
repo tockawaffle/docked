@@ -103,6 +103,12 @@ void splash_handle_scan_networks(lv_event_t *e)
     splash_ctx.state = SPLASH_WAIT_WIFI_INPUT;
 }
 
+typedef enum
+{
+    ERROR,
+    DEFAULT
+} text_format;
+
 void splash_task_cb(lv_timer_t *timer)
 {
     if (splash_ctx.timer_deleted)
@@ -133,7 +139,7 @@ void splash_task_cb(lv_timer_t *timer)
 
     case SPLASH_INIT_WIFI:
     {
-        wifi_detailed_status_t status = {0};
+        get_wifi_rps_t status = {0};
         lv_label_set_text(splash_ctx.debug_label, "Debug: Initializing Wi-Fi...");
         ret = wifi_init();
 
@@ -182,7 +188,7 @@ void splash_task_cb(lv_timer_t *timer)
 
         lv_label_set_text_fmt(splash_ctx.debug_label, "Debug: Connected to %s successfully", wifi_credentials.ssid);
         lv_obj_set_style_text_color(splash_ctx.debug_label, lv_color_hex(0x00FF00), 0);
-        splash_ctx.state = SPLASH_INIT_UI;
+        splash_ctx.state = SPLASH_STATE_INIT_HTTP_SERVER;
         break;
     }
     case SPLASH_STATE_RECONNECT_WIFI:
@@ -209,7 +215,7 @@ void splash_task_cb(lv_timer_t *timer)
         }
 
         ESP_LOGW(SPLASH_TAG, "SSID: %s, Password: %s", wifi_credentials.ssid, wifi_credentials.password);
-        wifi_detailed_status_t status = wifi_connect(wifi_credentials.ssid, wifi_credentials.password);
+        get_wifi_rps_t status = wifi_connect(wifi_credentials.ssid, wifi_credentials.password);
         if (status.code != ESP_OK)
         {
             lv_label_set_text_fmt(splash_ctx.debug_label, "Debug: Failed to connect to %s: %s",
@@ -221,15 +227,29 @@ void splash_task_cb(lv_timer_t *timer)
 
         lv_label_set_text_fmt(splash_ctx.debug_label, "Debug: Connected to %s successfully", splash_ctx.selected_ssid);
         lv_obj_set_style_text_color(splash_ctx.debug_label, lv_color_hex(0x00FF00), 0);
+        splash_ctx.state = SPLASH_STATE_INIT_HTTP_SERVER;
+        break;
+    case SPLASH_STATE_INIT_HTTP_SERVER:
+        lv_label_set_text(splash_ctx.debug_label, "Debug: Starting HTTP server for OTA...");
+
+        ret = init_ota_server();
+        if (ret != ESP_OK)
+        {
+            lv_label_set_text_fmt(splash_ctx.debug_label, "Debug: Failed to start the HTTP server, sorry...");
+            lv_obj_set_style_text_color(splash_ctx.debug_label, lv_color_hex(0xFF0000), LV_PART_MAIN);
+            goto cleanup;
+            break;
+        };
+
+        lv_label_set_text_fmt(splash_ctx.debug_label, "Debug: HTTP server initialized. Continuing...");
+        lv_obj_set_style_text_color(splash_ctx.debug_label, lv_color_hex(0x00FF00), 0);
         splash_ctx.state = SPLASH_INIT_UI;
         break;
-
     case SPLASH_INIT_UI:
         lv_bar_set_value(splash_ctx.loading_bar, 100, LV_ANIM_ON);
         splash_ctx.state = SPLASH_INIT_DONE;
 
         break;
-
     case SPLASH_INIT_DONE:
         // Delete existing timer first
         splash_delete_timer(timer, __FUNCTION__);

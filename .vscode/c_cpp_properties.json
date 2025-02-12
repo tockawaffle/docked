@@ -2,22 +2,33 @@
     "configurations": [
         {
             "name": "ESP-IDF",
-            "compilerPath": "${config:idf.toolsPath}/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc",
+            "compilerPath": "${config:idf.toolsPath}/tools/xtensa-esp32s3-elf/esp-2022r1-11.2.0/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc",
             "includePath": [
-                "${config:idf.espIdfPath}/components",
-                "${config:idf.espIdfPathWin}/components/",
-                "${workspaceFolder}/"
+                "${config:idf.espIdfPath}/**",
+                "${workspaceFolder}/**",
+                "${config:idf.espIdfPath}/components/**",
+                "${workspaceFolder}/build/config",
+                "${workspaceFolder}/main/**",
+                "${workspaceFolder}/components/**"
+            ],
+            "defines": [
+                "ESP_PLATFORM",
+                "IDF_VER=\"v5.4\""
             ],
             "browse": {
                 "path": [
                     "${workspaceFolder}",
-                    "${config:idf.espIdfPath}/components",
+                    "${config:idf.espIdfPath}",
                     "${workspaceFolder}/components",
                     "${workspaceFolder}/build/config"
                 ],
                 "limitSymbolsToIncludedHeaders": false
             },
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            "compileCommands": [
+                "${workspaceFolder}/build/compile_commands.json"
+            ],
+            "cStandard": "c11",
+            "intelliSenseMode": "linux-gcc-x86"
         }
     ],
     "version": 4

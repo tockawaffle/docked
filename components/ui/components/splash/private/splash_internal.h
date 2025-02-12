@@ -3,9 +3,10 @@
 #include "splash_screen.h"
 #include "splash_types.h"
 #include <colors.h>
-#include <sd_card.h>
-#include <wifi.h>
-#include <wifi_config.h>
+#include "storage_types.h"
+#include "wifi_c_types.h"
+#include <wifi_storage_types.h>
+#include "http_types.h"
 
 #define SPLASH_TAG "SplashScreen"
 

@@ -7,6 +7,9 @@ static lv_obj_t *active_menu = NULL;
 static char wifi_name_buf[50];
 static char signal_str_buf[50];
 
+#define WIFI_NAME_MAX_LEN 32
+#define SIGNAL_STR_MAX_LEN 16
+
 lv_obj_t *create_slide_menu(lv_obj_t *parent, const menu_def_t *menu_def)
 {
     if (!parent || !menu_def)
@@ -79,20 +82,25 @@ lv_obj_t *create_slide_menu(lv_obj_t *parent, const menu_def_t *menu_def)
     return menu;
 }
 
-// Create a function specifically for info panels
-lv_obj_t *create_info_panel(lv_obj_t *parent)
+lv_obj_t *create_info_panel(lv_obj_t *parent, sidebar_ctx_t ctx)
 {
     if (!parent)
         return NULL;
 
+    char wifi_name_buf[WIFI_NAME_MAX_LEN];
+    char signal_str_buf[SIGNAL_STR_MAX_LEN];
+
     // Create base container
     lv_obj_t *panel = lv_obj_create(parent);
     if (!panel)
+    {
+        ESP_LOGE(MENU_TAG, "Failed to create panel");
         return NULL;
+    }
 
     lv_obj_remove_style_all(panel);
     lv_obj_set_size(panel, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(panel, SIDEBAR_WIDTH + SPACING_UNIT, SPACING_UNIT); // Position next to sidebar
+    lv_obj_set_pos(panel, SIDEBAR_WIDTH + SPACING_UNIT, SPACING_UNIT);
     lv_obj_add_flag(panel, LV_OBJ_FLAG_HIDDEN);
 
     // Panel styling
@@ -104,9 +112,15 @@ lv_obj_t *create_info_panel(lv_obj_t *parent)
     lv_obj_set_style_border_color(panel, lv_color_hex(COLOR_PRIMARY), 0);
     lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_COLUMN);
 
-    // Update info text
-    snprintf(wifi_name_buf, sizeof(wifi_name_buf), "Network: %s", ctx.wifi.name);
-    snprintf(signal_str_buf, sizeof(signal_str_buf), "Signal: %d dBm", ctx.wifi.signal_strength);
+    // Calculate safe format length (account for "Network: " prefix)
+    size_t prefix_len = 9;                                        // Length of "Network: "
+    size_t max_name_len = sizeof(wifi_name_buf) - prefix_len - 1; // -1 for null terminator
+
+    // Safely format strings
+    snprintf(wifi_name_buf, sizeof(wifi_name_buf), "Network: %.*s",
+             (int)max_name_len, ctx.wifi.name);
+    snprintf(signal_str_buf, sizeof(signal_str_buf), "Signal: %d",
+             ctx.wifi.signal_strength);
 
     // Create each text line
     lv_obj_t *title = lv_label_create(panel);
@@ -173,6 +187,7 @@ void show_menu(lv_obj_t *menu)
     lv_anim_set_values(&a, -MENU_WIDTH, 0);
     lv_anim_start(&a);
 }
+
 void close_active_menu(void)
 {
     if (!active_menu)

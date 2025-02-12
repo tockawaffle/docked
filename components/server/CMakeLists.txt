@@ -1,0 +1,19 @@
+idf_component_register(
+    SRCS
+        "src/http_server.c"
+        "src/wss_server.c"
+        "src/keys.c"
+    INCLUDE_DIRS
+        "."
+        "include"
+    PRIV_INCLUDE_DIRS
+        "private"
+    REQUIRES
+        esp_http_server
+        esp_app_format
+        esp_http_client
+        mbedtls
+        app_update
+        json
+        wifi
+)

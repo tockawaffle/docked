@@ -3,4 +3,4 @@ dependencies:
   espressif/esp_lcd_touch_gt911: "^1.1.1"
   lvgl/lvgl: "^9.2.2"
   idf: ">=5.0.0"
-version: "1.0.0"
+version: "@PROJECT_VER@"

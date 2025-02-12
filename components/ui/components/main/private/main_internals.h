@@ -4,10 +4,9 @@
 #include "main_types.h"
 #include "menu_types.h"
 #include "colors.h"
-#include "sd_card.h"
-#include "lv_fs.h"
-#include "wifi.h"
-#include "wifi_config.h"
+#include "storage_types.h"
+#include "lv_fs_types.h"
+#include "wifi_storage_types.h"
 #include "logo.h"
 #include "icons.h"
 
