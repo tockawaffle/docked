@@ -58,23 +58,23 @@ jobs:
         path: |
           ~/.espressif
           ~/.cache/pip
+          ~/esp
         key: ${{ runner.os }}-esp-idf-${{ hashFiles('sdkconfig*') }}
         restore-keys: |
           ${{ runner.os }}-esp-idf-
     
     - name: Install ESP-IDF
       run: |
-        mkdir -p ~/.espressif
-        wget https://dl.espressif.com/dl/esp-idf/releases/esp-idf-v5.4.tar.gz
-        tar -xzf esp-idf-v5.4.tar.gz
-        mv esp-idf-v5.4 ~/.espressif/esp-idf
-        cd ~/.espressif/esp-idf
+        mkdir -p ~/esp
+        cd ~/esp
+        git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git
+        cd esp-idf
         ./install.sh esp32s3
         . ./export.sh
     
     - name: Build Project
       run: |
-        . ~/.espressif/esp-idf/export.sh
+        . ~/esp/esp-idf/export.sh
         idf.py reconfigure
         idf.py build
         
