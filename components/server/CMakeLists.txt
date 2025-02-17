@@ -12,6 +12,7 @@ idf_component_register(
         esp_http_server
         esp_app_format
         esp_http_client
+        storage
         mbedtls
         app_update
         json

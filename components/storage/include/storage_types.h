@@ -33,17 +33,8 @@
  *     - ESP_OK: Success
  *     - ESP_FAIL: Failed to initialize the SD card
  */
- 
-/**
- * @brief Get the SD card information.
- *
- * This function returns a pointer to the sdmmc_card_t structure that contains
- * information about the SD card.
- *
- * @return
- *     - sdmmc_card_t*: Pointer to the SD card information structure
- */
 esp_err_t sd_card_init(void);
+
 /**
  * @brief Retrieve the SD card instance.
  *

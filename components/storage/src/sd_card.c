@@ -165,7 +165,6 @@ esp_err_t sd_card_init(void)
      * This function initializes the SD card and mounts the filesystem,
      * making the SD card ready for read and write operations.
      */
-    // Mount filesystem
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
         .max_files = 5,

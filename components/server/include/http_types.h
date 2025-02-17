@@ -14,7 +14,7 @@ typedef struct
     const char *current_version;
     const char *latest_version;
     bool update_available;
-    unsigned char signature[512]; // Changed from uint8_t to unsigned char
+    unsigned char signature[512];
 } ota_status_t;
 
 esp_err_t init_ota_server(void);
